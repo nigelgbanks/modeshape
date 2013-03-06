@@ -218,6 +218,7 @@ public class JcrQueryManagerTest extends MultiUseAbstractTest {
                 registerNodeTypes(session, "cnd/magnolia.cnd");
                 registerNodeTypes(session, "cnd/notionalTypes.cnd");
                 registerNodeTypes(session, "cnd/cars.cnd");
+                registerNodeTypes(session, "cnd/validType.cnd");
 
                 InputStream stream = resourceStream("io/cars-system-view.xml");
                 try {
@@ -989,6 +990,20 @@ public class JcrQueryManagerTest extends MultiUseAbstractTest {
         QueryResult result = query.execute();
         assertThat(result, is(notNullValue()));
         assertResults(query, result, 9L);
+    }
+
+    @FixFor ( "MODE-1833" )
+    @Test
+    public void shouldBeAbleToQueryAllColumnsOnSimpleType() throws RepositoryException, IOException {
+        QueryManager queryManager = session.getWorkspace().getQueryManager();
+        QueryObjectModelFactory factory = queryManager.getQOMFactory();
+        Query query = factory.createQuery(factory.selector("modetest:simpleType", "type1"),
+                                          null, null,
+                                          new Column[]{factory.column("type1", null, null)});
+        assertThat(query, is(notNullValue()));
+        QueryResult result = query.execute();
+        assertThat(result, is(notNullValue()));
+        assertResults(query, result, 0L);
     }
 
     @Test
